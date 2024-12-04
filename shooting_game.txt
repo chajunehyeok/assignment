@@ -24,3 +24,15 @@ void moveBullets() {
         }
     }
 }
+
+void moveEnemyBullets() {
+    for (int i = 0; i < enemyCount; i++) {
+        for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+            if (enemies[i].bullets[j].active) {
+                enemies[i].bullets[j].y++;
+                if (enemies[i].bullets[j].y >= SCREEN_HEIGHT) {
+                    enemies[i].bullets[j].active = 0;  // 화면 밖으로 나가면 적의 총알 비활성화
+                }
+            }
+        }
+    }
