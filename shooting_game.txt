@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 25
+#define MAX_BULLETS 10
+#define MAX_ENEMIES 12
+#define MAX_ENEMY_BULLETS 5
+
 int main() {
     printf("탄막 슈팅 게임 준비 중...\n");
     return 0;
@@ -28,3 +34,4 @@ void movePlayer(char input) {
     if (input == 'a' && player.x > 0) player.x--;
     if (input == 'd' && player.x < 79) player.x++;
     if (enemies[i].x <= 0 || enemies[i].x >= 	SCREEN_WIDTH -1) { enemies[i].direction *= -1; }
+
