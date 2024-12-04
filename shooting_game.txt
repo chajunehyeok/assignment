@@ -12,6 +12,7 @@ int main() {
 typedef struct {
     int x, y;
     int alive;
+<<<<<<< HEAD
     int lives;
 } Player;
 
