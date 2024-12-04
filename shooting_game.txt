@@ -28,10 +28,20 @@ void moveEnemies() {
     for (int i = 0; i < enemyCount; i++) {
         if (enemies[i].alive) {
             enemies[i].x += enemies[i].direction;
-            if (enemies[i].x <= 0 || enemies[i].x >= 	SCREEN_WIDTH - 1) {
+            if (enemies[i].x <= 0 || enemies[i].x >= SCREEN_WIDTH - 1) {
                 enemies[i].direction *= -1;  // 벽에 부딪히면 방향 변경
-            		}
-		}
-	}
+            }
+
+            // 적이 총알을 발사하도록 만들기
+            for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+                if (!enemies[i].bullets[j].active) {
+                    enemies[i].bullets[j].x = enemies[i].x;
+                    enemies[i].bullets[j].y = enemies[i].y + 1;
+                    enemies[i].bullets[j].active = 1;
+                    break;
+                }
+            }
+        }
+    }
 }
 
