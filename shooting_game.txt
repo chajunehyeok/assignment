@@ -35,3 +35,14 @@ void movePlayer(char input) {
     if (input == 'd' && player.x < 79) player.x++;
     if (enemies[i].x <= 0 || enemies[i].x >= 	SCREEN_WIDTH -1) { enemies[i].direction *= -1; }
 
+void drawStartScreen() {
+    clearScreen();
+    printf("*******************************\n");
+    printf("*      탄막 슈팅 게임       *\n");
+    printf("*    스페이스바를 눌러 시작   *\n");
+    printf("*******************************\n");
+    printf("\n");
+    printf("게임 설명: 플레이어는 좌우로 움직이며 적을 처치하는 게임입니다.\n");
+    printf("적의 총알에 맞지 않도록 주의하세요!\n");
+    printf("게임을 시작하려면 스페이스바를 누르세요...\n");
+}
