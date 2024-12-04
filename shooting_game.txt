@@ -21,3 +21,8 @@ void initializePlayer() {
     player.alive = 1;
     player.lives = 3;
 }
+
+void movePlayer(char input) {
+    if (input == 'a' && player.x > 0) player.x--;
+    if (input == 'd' && player.x < 79) player.x++;
+}
