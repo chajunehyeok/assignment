@@ -14,3 +14,10 @@ typedef struct {
     int alive;
     int lives;
 } Player;
+
+void initializePlayer() {
+    player.x = 10;
+    player.y = 20;
+    player.alive = 1;
+    player.lives = 3;
+}
