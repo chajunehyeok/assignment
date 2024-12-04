@@ -8,3 +8,9 @@ int main() {
     printf("탄막 슈팅 게임 준비 중...\n");
     return 0;
 }
+
+typedef struct {
+    int x, y;
+    int alive;
+    int lives;
+} Player;
