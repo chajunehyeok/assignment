@@ -11,6 +11,7 @@ int main() {
 
 typedef struct {
     int x, y;
+<<<<<<< HEAD
     int alive;
 <<<<<<< HEAD
     int lives;
@@ -27,4 +28,3 @@ void movePlayer(char input) {
     if (input == 'a' && player.x > 0) player.x--;
     if (input == 'd' && player.x < 79) player.x++;
     if (enemies[i].x <= 0 || enemies[i].x >= 	SCREEN_WIDTH -1) { enemies[i].direction *= -1; }
-}
