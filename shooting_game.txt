@@ -8,3 +8,10 @@ int main() {
     printf("탄막 슈팅 게임 준비 중...\n");
     return 0;
 }
+
+typedef struct {
+    int x, y;
+    int alive;
+    int direction;  // 1: 오른쪽으로 이동, -1: 왼쪽으로 이동
+    Bullet bullets[MAX_ENEMY_BULLETS];  // 적의 총알
+} Enemy;
