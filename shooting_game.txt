@@ -36,3 +36,31 @@ void moveEnemyBullets() {
             }
         }
     }
+
+void checkCollisions() {
+    // 플레이어의 총알과 적의 충돌 검사
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            for (int j = 0; j < enemyCount; j++) {
+                if (enemies[j].alive && bullets[i].x == enemies[j].x && bullets[i].y == enemies[j].y) {
+                    bullets[i].active = 0;  // 총알 비활성화
+                    enemies[j].alive = 0;   // 적 비활성화
+                    score += 10;            // 점수 증가
+                }
+            }
+        }
+    }
+
+    // 플레이어와 적의 총알의 충돌 검사
+    for (int i = 0; i < enemyCount; i++) {
+        for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+            if (enemies[i].bullets[j].active && enemies[i].bullets[j].x == player.x && enemies[i].bullets[j].y == player.y) {
+                enemies[i].bullets[j].active = 0;  // 총알 비활성화
+                player.lives--;  // 플레이어 생명 감소
+                if (player.lives <= 0) {
+                    player.alive = 0;  // 플레이어 사망
+                }
+            }
+        }
+    }
+}
