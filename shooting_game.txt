@@ -64,3 +64,15 @@ void gameOver() {
 
     initializeGame();  // 게임 초기화
 }
+
+void updateGameDifficulty() {
+    // 점수에 따라 스테이지별로 난이도 증가
+    if (score >= 30 && stage == 1) {
+        stage = 2;
+        enemyCount = 7;  // 2단계에서는 적 수가 4명으로 증가
+    }
+    else if (score >= 70 && stage == 2) {
+        stage = 3;
+        enemyCount = 12;  // 3단계에서는 적 수가 5명으로 증가
+    }
+}
