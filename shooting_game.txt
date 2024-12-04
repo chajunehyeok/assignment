@@ -14,3 +14,13 @@ typedef struct {
     int active;
 } Bullet;
 
+void moveBullets() {
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            bullets[i].y--;
+            if (bullets[i].y < 0) {
+                bullets[i].active = 0;  // 화면 밖으로 나가면 총알 비활성화
+            }
+        }
+    }
+}
