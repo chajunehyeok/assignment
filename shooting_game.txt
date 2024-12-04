@@ -10,30 +10,39 @@
 #define MAX_ENEMIES 12
 #define MAX_ENEMY_BULLETS 5
 
-int main() {
-    printf("탄막 슈팅 게임 준비 중...\n");
-    return 0;
-}
-
+// 플레이어 구조체
 typedef struct {
     int x, y;
-<<<<<<< HEAD
     int alive;
-<<<<<<< HEAD
     int lives;
 } Player;
 
-void initializePlayer() {
-    player.x = 10;
-    player.y = 20;
-    player.alive = 1;
-    player.lives = 3;
-}
+// 총알 구조체
+typedef struct {
+    int x, y;
+    int active;
+} Bullet;
 
-void movePlayer(char input) {
-    if (input == 'a' && player.x > 0) player.x--;
-    if (input == 'd' && player.x < 79) player.x++;
-    if (enemies[i].x <= 0 || enemies[i].x >= 	SCREEN_WIDTH -1) { enemies[i].direction *= -1; }
+// 적 구조체
+typedef struct {
+    int x, y;
+    int alive;
+    int direction;  // 1: 오른쪽으로 이동, -1: 왼쪽으로 이동
+    Bullet bullets[MAX_ENEMY_BULLETS];  // 적의 총알
+} Enemy;
+
+Player player;
+Bullet bullets[MAX_BULLETS];
+Enemy enemies[MAX_ENEMIES];
+int score = 0;
+int enemyCount = 3;  // 시작 시 적 3명
+int stage = 1;  // 게임의 현재 스테이지
+
+// 화면 버퍼를 위한 출력 함수
+void clearScreen() {
+    COORD coord = { 0, 0 };  // 커서를 화면의 가장 위 왼쪽으로 이동
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
 
 void drawStartScreen() {
     clearScreen();
@@ -46,6 +55,199 @@ void drawStartScreen() {
     printf("적의 총알에 맞지 않도록 주의하세요!\n");
     printf("게임을 시작하려면 스페이스바를 누르세요...\n");
 }
+
+void initializeGame() {
+    player.x = SCREEN_WIDTH / 2;
+    player.y = SCREEN_HEIGHT - 2;
+    player.alive = 1;
+    player.lives = 3;
+
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        bullets[i].active = 0;  // 모든 총알은 비활성화 상태로 시작
+    }
+
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        enemies[i].x = rand() % (SCREEN_WIDTH - 2);
+        enemies[i].y = rand() % (SCREEN_HEIGHT / 2);
+        enemies[i].alive = 1;
+        enemies[i].direction = (rand() % 2) == 0 ? 1 : -1;  // 무작위로 이동 방향 설정
+        for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+            enemies[i].bullets[j].active = 0;  // 모든 적의 총알은 비활성화 상태로 시작
+        }
+    }
+
+    score = 0;
+}
+
+void drawScreen() {
+    clearScreen();  // 화면을 지우지 않고 커서를 맨 위로 이동
+
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            if (x == player.x && y == player.y) {
+                printf("^");  // 플레이어 심볼
+            }
+            else {
+                int printed = 0;
+
+                // 총알 그리기
+                for (int i = 0; i < MAX_BULLETS; i++) {
+                    if (bullets[i].active && bullets[i].x == x && bullets[i].y == y) {
+                        printf("|");  // 총알 심볼
+                        printed = 1;
+                        break;
+                    }
+                }
+
+                // 적 그리기
+                if (!printed) {
+                    for (int i = 0; i < enemyCount; i++) {
+                        if (enemies[i].alive && enemies[i].x == x && enemies[i].y == y) {
+                            printf("V");  // 적 심볼
+                            printed = 1;
+                            break;
+                        }
+                    }
+                }
+
+                // 적의 총알 그리기
+                if (!printed) {
+                    for (int i = 0; i < enemyCount; i++) {
+                        for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+                            if (enemies[i].bullets[j].active && enemies[i].bullets[j].x == x && enemies[i].bullets[j].y == y) {
+                                printf("*");  // 적의 총알 심볼
+                                printed = 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!printed) {
+                    printf(" ");  // 빈 공간
+                }
+            }
+        }
+        printf("\n");
+    }
+
+    printf("\n점수: %d  생명: %d  스테이지: %d\n", score, player.lives, stage);
+}
+
+void movePlayer() {
+    if (_kbhit()) {
+        char ch = _getch();
+
+        if (ch == 'a' && player.x > 0) {
+            player.x--;
+        }
+        else if (ch == 'd' && player.x < SCREEN_WIDTH - 1) {
+            player.x++;
+        }
+        else if (ch == 'w' && player.y > 0) {
+            player.y--;
+        }
+        else if (ch == 's' && player.y < SCREEN_HEIGHT - 1) {
+            player.y++;
+        }
+        else if (ch == ' ') {  // 총알 발사
+            for (int i = 0; i < MAX_BULLETS; i++) {
+                if (!bullets[i].active) {
+                    bullets[i].x = player.x;
+                    bullets[i].y = player.y - 1;
+                    bullets[i].active = 1;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void moveBullets() {
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            bullets[i].y--;
+            if (bullets[i].y < 0) {
+                bullets[i].active = 0;  // 화면 밖으로 나가면 총알 비활성화
+            }
+        }
+    }
+}
+
+void moveEnemies() {
+    for (int i = 0; i < enemyCount; i++) {
+        if (enemies[i].alive) {
+            enemies[i].x += enemies[i].direction;
+            if (enemies[i].x <= 0 || enemies[i].x >= SCREEN_WIDTH - 1) {
+                enemies[i].direction *= -1;  // 벽에 부딪히면 방향 변경
+            }
+
+            // 적이 총알을 발사하도록 만들기
+            for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+                if (!enemies[i].bullets[j].active) {
+                    enemies[i].bullets[j].x = enemies[i].x;
+                    enemies[i].bullets[j].y = enemies[i].y + 1;
+                    enemies[i].bullets[j].active = 1;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void moveEnemyBullets() {
+    for (int i = 0; i < enemyCount; i++) {
+        for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+            if (enemies[i].bullets[j].active) {
+                enemies[i].bullets[j].y++;
+                if (enemies[i].bullets[j].y >= SCREEN_HEIGHT) {
+                    enemies[i].bullets[j].active = 0;  // 화면 밖으로 나가면 적의 총알 비활성화
+                }
+            }
+        }
+    }
+}
+
+void checkCollisions() {
+    // 플레이어의 총알과 적의 충돌 검사
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            for (int j = 0; j < enemyCount; j++) {
+                if (enemies[j].alive && bullets[i].x == enemies[j].x && bullets[i].y == enemies[j].y) {
+                    bullets[i].active = 0;  // 총알 비활성화
+                    enemies[j].alive = 0;   // 적 비활성화
+                    score += 10;            // 점수 증가
+                }
+            }
+        }
+    }
+
+    // 플레이어와 적의 총알의 충돌 검사
+    for (int i = 0; i < enemyCount; i++) {
+        for (int j = 0; j < MAX_ENEMY_BULLETS; j++) {
+            if (enemies[i].bullets[j].active && enemies[i].bullets[j].x == player.x && enemies[i].bullets[j].y == player.y) {
+                enemies[i].bullets[j].active = 0;  // 총알 비활성화
+                player.lives--;  // 플레이어 생명 감소
+                if (player.lives <= 0) {
+                    player.alive = 0;  // 플레이어 사망
+                }
+            }
+        }
+    }
+}
+
+void updateGameDifficulty() {
+    // 점수에 따라 스테이지별로 난이도 증가
+    if (score >= 30 && stage == 1) {
+        stage = 2;
+        enemyCount = 7;  // 2단계에서는 적 수가 4명으로 증가
+    }
+    else if (score >= 70 && stage == 2) {
+        stage = 3;
+        enemyCount = 12;  // 3단계에서는 적 수가 5명으로 증가
+    }
+}
+
 
 void gameOver() {
     system("cls");  // 화면 지우기
@@ -65,14 +267,64 @@ void gameOver() {
     initializeGame();  // 게임 초기화
 }
 
-void updateGameDifficulty() {
-    // 점수에 따라 스테이지별로 난이도 증가
-    if (score >= 30 && stage == 1) {
-        stage = 2;
-        enemyCount = 7;  // 2단계에서는 적 수가 4명으로 증가
+void updateGame() {
+    if (score >= 120) {
+        gameOver();  // 점수 120점에 도달하면 게임 종료
     }
-    else if (score >= 70 && stage == 2) {
-        stage = 3;
-        enemyCount = 12;  // 3단계에서는 적 수가 5명으로 증가
+
+    movePlayer();
+    moveBullets();
+    moveEnemies();
+    moveEnemyBullets();
+    checkCollisions();
+
+    drawScreen();
+}
+
+int main() {
+    srand(time(NULL));
+
+    // 게임 시작 전 인터페이스 표시
+    drawStartScreen();
+
+    // 스페이스바를 누르면 게임 시작
+    while (1) {
+        if (_kbhit()) {
+            char ch = _getch();
+            if (ch == ' ') {
+                break;  // 스페이스바가 눌리면 게임 시작
+            }
+        }
     }
+
+    while (1) {
+        initializeGame();
+
+        while (player.alive) {
+            drawScreen();
+            movePlayer();
+            moveBullets();
+            moveEnemies();
+            moveEnemyBullets();
+            checkCollisions();
+            updateGameDifficulty();
+            Sleep(50);  // 게임이 플레이 가능하도록 루프 속도 조정
+        }
+
+        printf("게임 오버! 최종 점수: %d\n", score);
+        if (player.lives > 0) {
+            printf("아직 생명이 남아있습니다!\n");
+        }
+        else {
+            printf("게임 오버! 남은 생명이 없습니다.\n");
+        }
+
+        printf("게임을 다시 시작하려면 'r'을 눌러주세요. 종료하려면 다른 키를 누르세요...\n");
+        char choice = _getch();
+        if (choice != 'r') {
+            break;  // 게임 종료
+        }
+    }
+
+    return 0;
 }
