@@ -23,3 +23,15 @@ for (int i = 0; i < MAX_ENEMIES; i++) {
         enemies[i].alive = 1;
         enemies[i].direction = (rand() % 2) == 0 ? 1 : -1;
 }
+
+void moveEnemies() {
+    for (int i = 0; i < enemyCount; i++) {
+        if (enemies[i].alive) {
+            enemies[i].x += enemies[i].direction;
+            if (enemies[i].x <= 0 || enemies[i].x >= 	SCREEN_WIDTH - 1) {
+                enemies[i].direction *= -1;  // 벽에 부딪히면 방향 변경
+            		}
+		}
+	}
+}
+
